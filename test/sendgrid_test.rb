@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SendgridTest < Test::Unit::TestCase
+class SendgridTest < Minitest::Test
   def setup
     ActionMailer::Base.delivery_method = :test
     ActionMailer::Base.perform_deliveries = true
@@ -21,7 +21,7 @@ class SendgridTest < Test::Unit::TestCase
   end
 
   should "require the same number of items in a substitution array as is in the recipient array" do
-    assert_raise ArgumentError do
+    assert_raises ArgumentError do
       test_email = SendgridCampaignTestMailer.create_test(@options).deliver
     end
   end

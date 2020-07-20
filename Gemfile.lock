@@ -118,6 +118,7 @@ DEPENDENCIES
   bundler (~> 2.0)
   jeweler (~> 2.3)
   json
+  minitest (>= 5.0)
   shoulda
 
 BUNDLED WITH
