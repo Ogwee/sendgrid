@@ -49,9 +49,11 @@ end
 class SendgridUniqueArgsMailer < ActionMailer::Base
   include SendGrid
   sendgrid_unique_args({ :test_arg => "test value" })
+  sendgrid_ip_pool('high-risk-delivery')
 
   def unique_args_test_email(options)
     sendgrid_unique_args({ :mailer_method_unique_arg => "some value" })
+    sendgrid_ip_pool(options[:ip_pool])
     mail(options)
   end
 end

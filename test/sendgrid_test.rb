@@ -13,6 +13,7 @@ class SendgridTest < Minitest::Test
       :subject => 'The Subject',
       :body => '<html>content</html>',
       :category => 'MyCategory',
+      :ip_pool => :maximum_delivery,
       :substitutions => {
         'first_name' => ['Joe'],
         'last_name' => ['Schmoe', 'Cool']
@@ -30,12 +31,17 @@ class SendgridTest < Minitest::Test
     assert_equal ({ :test_arg => "test value" }), SendgridUniqueArgsMailer.default_sg_unique_args
   end
 
+  should "accept ip_pool arg at the class level" do
+    assert_equal ('high-risk-delivery'), SendgridUniqueArgsMailer.default_sg_ip_pool
+  end
+
+
   should "pass unique args from both the mailer class and the mailer method through custom headers" do
     @options.delete(:substitutions)
     SendgridUniqueArgsMailer.unique_args_test_email(@options).deliver
     mail = ActionMailer::Base.deliveries.last
     # assert({ :unique_args => {:mailer_method_unique_arg => "some value", :test_arg => "test value"} }.to_json == mail.header['X-SMTPAPI'].value)
-    expected = { 'unique_args' => {'mailer_method_unique_arg' => "some value", 'test_arg' => "test value"} }
+    expected = { 'unique_args' => {'mailer_method_unique_arg' => "some value", 'test_arg' => "test value"}, 'ip_pool' => 'maximum_delivery' }
     actual = JSON.parse(mail.header['X-SMTPAPI'].value)
     assert_equal(expected, actual)
   end

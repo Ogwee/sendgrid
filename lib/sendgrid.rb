@@ -25,10 +25,12 @@ module SendGrid
     base.class_eval do
       class << self
         attr_accessor :default_sg_category, :default_sg_options, :default_subscriptiontrack_text,
-                      :default_footer_text, :default_spamcheck_score, :default_sg_unique_args
+                      :default_footer_text, :default_spamcheck_score, :default_sg_unique_args,
+                      :default_sg_ip_pool
       end
       attr_accessor :sg_category, :sg_options, :sg_disabled_options, :sg_recipients, :sg_substitutions,
-                    :subscriptiontrack_text, :footer_text, :spamcheck_score, :sg_unique_args, :sg_send_at
+                    :subscriptiontrack_text, :footer_text, :spamcheck_score, :sg_unique_args, :sg_send_at,
+                    :sg_ip_pool
     end
 
     # NOTE: This commented-out approach may be a "safer" option for Rails 3, but it
@@ -52,6 +54,11 @@ module SendGrid
       self.default_sg_category = category
     end
 
+    # Sets a default ip_pool for all emails.
+    def sendgrid_ip_pool(ip_pool)
+      self.default_sg_ip_pool = ip_pool
+    end
+
     # Enables a default option for all emails.
     # See documentation for details.
     #
@@ -67,7 +74,7 @@ module SendGrid
       self.default_sg_options = Array.new unless self.default_sg_options
       options.each { |option| self.default_sg_options << option if VALID_OPTIONS.include?(option) }
     end
-    
+
     # Sets the default text for subscription tracking (must be enabled).
     # There are two options:
     # 1. Add an unsubscribe link at the bottom of the email
@@ -101,6 +108,11 @@ module SendGrid
   # Call within mailer method to override the default value.
   def sendgrid_category(category)
     @sg_category = category
+  end
+
+  # Call within mailer method to override the default ip_pool value.
+  def sendgrid_ip_pool(ip_pool)
+    @sg_ip_pool = ip_pool
   end
 
   # Call within mailer method to set send time for this mail
@@ -161,7 +173,7 @@ module SendGrid
     @ganalytics_options = []
     options.each { |option| @ganalytics_options << option if VALID_GANALYTICS_OPTIONS.include?(option[0].to_sym) }
   end
-  
+
   # only override the appropriate methods for the current ActionMailer version
   if ActionMailer::Base.respond_to?(:mail)
 
@@ -206,7 +218,7 @@ module SendGrid
 
     #if not called within the mailer method, this will be nil so we default to empty hash
     @sg_unique_args = @sg_unique_args || {}
-    
+
     # set the unique arguments
     if @sg_unique_args || self.class.default_sg_unique_args
       unique_args = self.class.default_sg_unique_args || {}
@@ -225,6 +237,10 @@ module SendGrid
     elsif self.class.default_sg_category
       header_opts[:category] = self.class.default_sg_category
     end
+
+    # set the ip_pool argument
+    sg_ip_pool = @sg_ip_pool || self.class.default_sg_ip_pool
+    header_opts[:ip_pool] = sg_ip_pool if sg_ip_pool.present?
 
     #Set send_at if set by the user
     header_opts[:send_at] = @sg_send_at unless @sg_send_at.blank?
