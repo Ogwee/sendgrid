@@ -1,6 +1,6 @@
 require 'json'
 
-module SendGrid
+module SendGridSmtp
 
   VALID_OPTIONS = [
     :opentrack,

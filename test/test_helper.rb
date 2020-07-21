@@ -8,7 +8,7 @@ require 'action_mailer'
 require 'sendgrid'
 
 class SendgridCampaignTestMailer < ActionMailer::Base
-  include SendGrid
+  include SendGridSmtp
 
   sendgrid_enable :opentrack, :clicktrack, :subscriptiontrack, :bypass_list_management
 
@@ -47,7 +47,7 @@ class SendgridCampaignTestMailer < ActionMailer::Base
 end
 
 class SendgridUniqueArgsMailer < ActionMailer::Base
-  include SendGrid
+  include SendGridSmtp
   sendgrid_unique_args({ :test_arg => "test value" })
   sendgrid_ip_pool('high-risk-delivery')
 
