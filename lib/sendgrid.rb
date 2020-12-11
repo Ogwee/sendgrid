@@ -189,6 +189,9 @@ module SendGridSmtp
         end
       end
       puts "SendGrid X-SMTPAPI: #{sendgrid_json_headers(message)}" if Object.const_defined?("SENDGRID_DEBUG_OUTPUT") && SENDGRID_DEBUG_OUTPUT
+
+      self.header.fields.delete_if { |field| field.name == 'X-SMTPAPI' }
+
       self.headers['X-SMTPAPI'] = sendgrid_json_headers(message)
       m
     end
