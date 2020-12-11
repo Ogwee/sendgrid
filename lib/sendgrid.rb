@@ -190,7 +190,8 @@ module SendGridSmtp
       end
       puts "SendGrid X-SMTPAPI: #{sendgrid_json_headers(message)}" if Object.const_defined?("SENDGRID_DEBUG_OUTPUT") && SENDGRID_DEBUG_OUTPUT
 
-      self.headers['X-SMTPAPI'] = nil # see https://api.rubyonrails.org/v5.1/classes/ActionMailer/Base.html#method-i-headers
+      # see https://api.rubyonrails.org/v5.1/classes/ActionMailer/Base.html#method-i-headers
+      self.headers['X-SMTPAPI'] = nil if self.headers['X-SMTPAPI'].present?
 
       self.headers['X-SMTPAPI'] = sendgrid_json_headers(message)
       m
